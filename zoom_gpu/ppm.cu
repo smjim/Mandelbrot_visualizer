@@ -108,15 +108,15 @@ int main(){
 		time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
 #endif /*DB*/
 
-#ifdef MANDELBROT
+#ifdef OPTIMIZED
 		dim3 dim_grid, dim_block;
 		dim_grid = dim3(height, 1,1);
 		dim_block = dim3(width, 1,1);
 		begin = clock();
-		mandelbrot<<<dim_grid, dim_block>>>(b1.x, b1.y, b2.x, b2.y, outputData_d, width, height);
+		optimized<<<dim_grid, dim_block>>>(b1.x, b1.y, b2.x, b2.y, outputData_d, width, height);
 		end = clock();
 		time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
-#endif /*MB*/
+#endif /*OPT*/
 
         cuda_ret = cudaDeviceSynchronize();
         if(cuda_ret != cudaSuccess) FATAL();	// unable to launch/ execute kernel

@@ -9,7 +9,7 @@
 		2. Generate data: `g++ generate_set.cpp -o Generate`, and `./Generate`
 		3. Display data: `python3 display.py`
 	- GPU dynamic video:
-		1. Edit boundaries() function in ppm.cu
+		1. Edit center, MAX_R, MIN_R, and length in ppm.cu
 		2. Compile and generate the video: `make`, and `./zoom`
 		3. Combine output frames: `ffmpeg -framerate 24 -i outfiles/tmp%03d.ppm -c:v libx264 -r 30 -pix_fmt yuv420p output_video.mp4`
 

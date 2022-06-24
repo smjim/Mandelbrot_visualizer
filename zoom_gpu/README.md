@@ -11,8 +11,10 @@ This code produces a video zooming in a certain depth to a certain coordinate of
 
 2. Choose an operation, compile and run it
 
-	- zoom (default)
-		* `make zoom`, then `./zoom`
+	- [optimized](https://en.wikipedia.org/wiki/Plotting_algorithms_for_the_Mandelbrot_set#Optimized_escape_time_algorithms) (default)
+		* `make optimized`, then `./optimized`
+	- [derbail](https://en.wikipedia.org/wiki/Plotting_algorithms_for_the_Mandelbrot_set#Derivative_Bailout_or_%22derbail%22) (uses derivative/ bailout method)
+		* `make derbail`, then `./derbail`
 
 3. Use FFmpeg to combine the output frames into a video:
 ```

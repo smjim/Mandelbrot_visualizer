@@ -6,19 +6,25 @@ NVCC_FLAGS  = -O3
 LD_FLAGS    = -lcudart
 
 
-default: zoom
+default: optimized
 
 #convolution.o: ppm.cu ppmKernel.cu
 #	$(NVCC) -c -o convolution.o ppm.cu $(NVCC_FLAGS) -D CONV
 
-zoom.o: ppm.cu ppmMandelbrot.cu
-	$(NVCC) -c -o zoom.o ppm.cu $(NVCC_FLAGS) -D MANDELBROT 
+derbail.o: ppm.cu ppmMandelbrot.cu
+	$(NVCC) -c -o derbail.o ppm.cu $(NVCC_FLAGS) -D DERBAIL 
+
+optimized.o: ppm.cu ppmMandelbrot.cu
+	$(NVCC) -c -o optimized.o ppm.cu $(NVCC_FLAGS) -D OPTIMIZED 
 
 #convolution: convolution.o
 #	$(NVCC) convolution.o -o convolution $(LD_FLAGS)
 
-zoom: zoom.o
-	$(NVCC) zoom.o -o zoom $(LD_FLAGS)
+derbail: derbail.o
+	$(NVCC) derbail.o -o derbail $(LD_FLAGS)
+
+optimized: optimized.o
+	$(NVCC) optimized.o -o optimized $(LD_FLAGS)
 
 clean:
-	rm -rf *.o zoom convolution outfiles/tmp* *.mp4
+	rm -rf *.o optimized derbail outfiles/tmp* *.mp4

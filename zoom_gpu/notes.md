@@ -18,6 +18,10 @@
 - [COMPLETE] right now, the image is bounded by the width and height of the original
 video file, which is not wanted. a fix would involve removing all refs to
 the original video file, and passing in new width and height
-- a new function needs to be defined that outputs coords b1, b2 given t
+- [COMPLETE] a new function needs to be defined that outputs coords b1, b2 given t
+- linear interpolation zoom function needs to be non linear (slow down as approach)
+	*log time
+- instead of using boundaries to determine zoom, use logarithmically decreasing
+radius centered on a point
 - new coloring scheme is necessary
 - eventually implement long double and extra long double to achieve higher zooms
