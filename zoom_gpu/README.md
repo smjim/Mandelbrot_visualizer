@@ -5,7 +5,7 @@ This project utilizes parallel computing to improve the efficiency of Mandelbrot
 
 This code produces a video zooming in a certain depth to a certain coordinate of the Mandelbrot set.
 
-###How To Generate A Video:
+### How To Generate A Video:
 
 1. Download and install [FFmpeg](https://ffmpeg.org/)
 
