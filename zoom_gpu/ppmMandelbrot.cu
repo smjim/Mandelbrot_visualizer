@@ -2,9 +2,6 @@
 #include <math.h>
 
 
-// Constant memory for convolution filter
-//__constant__ Filter filter_c;
-
 // determines mandelbrot status for each pixel between b1, b2
 __global__ void optimized(double b1x, double b1y, double b2x, double b2y, PPMPixel *outputData, int width, int height) {
 
@@ -44,7 +41,6 @@ __global__ void optimized(double b1x, double b1y, double b2x, double b2y, PPMPix
 		outputData[i].blue = iteration;
 	}
 }
-
 // determines mandelbrot status for each pixel between b1, b2
 __global__ void derbail(double b1x, double b1y, double b2x, double b2y, PPMPixel *outputData, int width, int height) {
 
@@ -69,9 +65,9 @@ __global__ void derbail(double b1x, double b1y, double b2x, double b2y, PPMPixel
 		float dy_sum = 0;
 	
 		int iteration = 0;
-		int max_iteration = 200;
+		int max_iteration = 400;
 	
-		int dbail = 1e6; // higher dbail value reveals more detail, increases convergence time
+		int dbail = 1e9; // higher dbail value reveals more detail, increases convergence time
 	
 		// z'(n+1) = 2 * z'(n) * z(n) + 1
 		while (dx_sum*dx_sum + dy_sum*dy_sum < dbail && x1*x1 + y1*y1 <= 4 && iteration < max_iteration) {
@@ -89,10 +85,10 @@ __global__ void derbail(double b1x, double b1y, double b2x, double b2y, PPMPixel
 			iteration ++; 
 		}
 
-		// color according to iteration
-		outputData[i].red = iteration;
-		outputData[i].green = iteration;
-		outputData[i].blue = iteration;
+		// color smooth gradient according to hsv
+		outputData[i].red = iteration % 360;
+		outputData[i].green = 100;
+		outputData[i].blue = 100 * iteration/ max_iteration;
 	}
 
 

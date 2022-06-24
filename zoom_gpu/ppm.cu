@@ -5,17 +5,18 @@
 #include "ppmMandelbrot.cu"
 #include "ppm.h"
 
-#include <iostream>
+const int width = 1000;
+const int height = 1000;
 
-const int width = 1024;
-const int height = 860;
-
-const int length = 301; // length of video in frames
+const int length = 601; // length of video in frames
 
 //const coord center = {-0.6081, -0.6756};
-const coord center = {-0.744749, -0.208039};
-const double MAX_R = 2.0000;
-const double MIN_R = 0.0020;
+//const coord center = {-0.744749, -0.208039};
+const coord center = {-0.724973, -0.357569}; // seahorse valley
+//const coord center = {-0.10109636384562, 0.95628651080914};
+//const coord center = {-0.1010963, 0.9562865};
+const double MAX_R = 2.00000000000;
+const double MIN_R = 0.00000000002;
 
 #define RGB_COMPONENT_COLOR 255
 
@@ -56,9 +57,9 @@ void boundaries(int frame, coord &b1, coord &b2) {
 	double t = (double)frame/length;
 	double r = pow(MIN_R, t) * pow(MAX_R, 1-t);
 
-	b1.x = center.x + r;
+	b1.x = center.x - r;
 	b1.y = center.y + r;
-	b2.x = center.x - r;
+	b2.x = center.x + r;
 	b2.y = center.y - r;
 }
 
