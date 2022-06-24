@@ -7,10 +7,14 @@
 const int width = 512;
 const int height = 512;
 
+const int length = 301; // length of video in frames
+
+const coord startBound_1 = {-2.000, -1.120};
+const coord startBound_2 = { 0.470,  1.120};
+const coord endBound_1 = {-0.650, 0.600};
+const coord endBound_2 = {-0.475, 0.700};
+
 #define RGB_COMPONENT_COLOR 255
-
-#define OUTPUT_TILE_SIZE 12
-
 
 #define FATAL(...) \
     do {\
@@ -43,12 +47,23 @@ void writePPM(const char *filename, PPMImage *img)
     fclose(fp);
 }
 
-void boundaries(int frame, float *b1x, float *b1y, float *b2x, float *b2y) { 
-	b1x = (float*)(-2.00);
-	b1y = (float*)(-1.12);
-	b2x = (float*)0.47;
-	b2y = (float*)1.12;
+/*
+void boundaries(int frame, coord *b1, coord *b2) { 
+	// linear interpolation between startBound_N and endBound_N
+	b1->x = (double)(frame/length) * (endBound_1.x - startBound_1.x) + startBound_1.x;
+	b1->y = (double)(frame/length) * (endBound_1.y - startBound_1.y) + startBound_1.y;
+	b2->x = (double)(frame/length) * (endBound_2.x - startBound_2.x) + startBound_2.x;
+	b2->y = (double)(frame/length) * (endBound_2.y - startBound_2.y) + startBound_2.y;
 }
+*/
+void boundaries(int frame, coord &b1, coord &b2) { 
+	// linear interpolation between startBound_N and endBound_N
+	b1.x = ((double)frame/length) * (endBound_1.x - startBound_1.x) + startBound_1.x;
+	b1.y = ((double)frame/length) * (endBound_1.y - startBound_1.y) + startBound_1.y;
+	b2.x = ((double)frame/length) * (endBound_2.x - startBound_2.x) + startBound_2.x;
+	b2.y = ((double)frame/length) * (endBound_2.y - startBound_2.y) + startBound_2.y;
+}
+
 
 int main(){
 
@@ -76,22 +91,20 @@ int main(){
     outImage->x = width;
     outImage->y = height;
 
-	float b1x;//, float b1y, float b2x, float b2y;
-	float b1y;
-	float b2x;
-	float b2y;
+	coord b1 = startBound_1;
+	coord b2 = startBound_2;
     // for each of the frames run the kernel
-    for(i = 0; i < 301; i++) {
+    for(i = 0; i < length; i++) {
         sprintf(outstr, "outfiles/tmp%03d.ppm", i+1);
 
-		boundaries(i, b1x, b1y, b2x, b2y);
+		boundaries(i, b1, b2);
 
 #ifdef MANDELBROT
 		dim3 dim_grid, dim_block;
 		dim_grid = dim3(height, 1,1);
 		dim_block = dim3(width, 1,1);
 		begin = clock();
-		mandelbrot<<<dim_grid, dim_block>>>(b1x, b1y, b2x, b2y, outputData_d, width, height);
+		mandelbrot<<<dim_grid, dim_block>>>(b1.x, b1.y, b2.x, b2.y, outputData_d, width, height);
 		end = clock();
 		time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
 #endif /*MB*/

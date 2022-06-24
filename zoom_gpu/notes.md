@@ -20,3 +20,4 @@ video file, which is not wanted. a fix would involve removing all refs to
 the original video file, and passing in new width and height
 - a new function needs to be defined that outputs coords b1, b2 given t
 - new coloring scheme is necessary
+- eventually implement long double and extra long double to achieve higher zooms
