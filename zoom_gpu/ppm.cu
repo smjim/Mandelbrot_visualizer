@@ -1,18 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <cmath>
 #include "ppmMandelbrot.cu"
 #include "ppm.h"
 
-const int width = 512;
-const int height = 512;
+#include <iostream>
+
+const int width = 1024;
+const int height = 860;
 
 const int length = 301; // length of video in frames
 
-const coord startBound_1 = {-2.000, -1.120};
-const coord startBound_2 = { 0.470,  1.120};
-const coord endBound_1 = {-0.650, 0.600};
-const coord endBound_2 = {-0.475, 0.700};
+//const coord center = {-0.6081, -0.6756};
+const coord center = {-0.744749, -0.208039};
+const double MAX_R = 2.0000;
+const double MIN_R = 0.0020;
 
 #define RGB_COMPONENT_COLOR 255
 
@@ -47,21 +50,16 @@ void writePPM(const char *filename, PPMImage *img)
     fclose(fp);
 }
 
-/*
-void boundaries(int frame, coord *b1, coord *b2) { 
-	// linear interpolation between startBound_N and endBound_N
-	b1->x = (double)(frame/length) * (endBound_1.x - startBound_1.x) + startBound_1.x;
-	b1->y = (double)(frame/length) * (endBound_1.y - startBound_1.y) + startBound_1.y;
-	b2->x = (double)(frame/length) * (endBound_2.x - startBound_2.x) + startBound_2.x;
-	b2->y = (double)(frame/length) * (endBound_2.y - startBound_2.y) + startBound_2.y;
-}
-*/
 void boundaries(int frame, coord &b1, coord &b2) { 
-	// linear interpolation between startBound_N and endBound_N
-	b1.x = ((double)frame/length) * (endBound_1.x - startBound_1.x) + startBound_1.x;
-	b1.y = ((double)frame/length) * (endBound_1.y - startBound_1.y) + startBound_1.y;
-	b2.x = ((double)frame/length) * (endBound_2.x - startBound_2.x) + startBound_2.x;
-	b2.y = ((double)frame/length) * (endBound_2.y - startBound_2.y) + startBound_2.y;
+	// logarithmic interpolation between radius MAX_R and MIN_R 
+	// first map time domain to log spaced points, then shift
+	double t = (double)frame/length;
+	double r = pow(MIN_R, t) * pow(MAX_R, 1-t);
+
+	b1.x = center.x + r;
+	b1.y = center.y + r;
+	b2.x = center.x - r;
+	b2.y = center.y - r;
 }
 
 
@@ -91,13 +89,24 @@ int main(){
     outImage->x = width;
     outImage->y = height;
 
-	coord b1 = startBound_1;
-	coord b2 = startBound_2;
+	coord b1;
+	coord b2;
+
     // for each of the frames run the kernel
     for(i = 0; i < length; i++) {
         sprintf(outstr, "outfiles/tmp%03d.ppm", i+1);
 
 		boundaries(i, b1, b2);
+
+#ifdef DERBAIL
+		dim3 dim_grid, dim_block;
+		dim_grid = dim3(height, 1,1);
+		dim_block = dim3(width, 1,1);
+		begin = clock();
+		derbail<<<dim_grid, dim_block>>>(b1.x, b1.y, b2.x, b2.y, outputData_d, width, height);
+		end = clock();
+		time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+#endif /*DB*/
 
 #ifdef MANDELBROT
 		dim3 dim_grid, dim_block;
