@@ -23,5 +23,9 @@ the original video file, and passing in new width and height
 	*log time
 - [COMPLETE] instead of using boundaries to determine zoom, use logarithmically decreasing
 radius centered on a point
-- new coloring scheme is necessary
+- [COMPLETE] new coloring scheme is necessary
 - eventually implement long double and extra long double to achieve higher zooms
+- implement new addressing scheme independent of order (perform operations as if
+in range -10, 10 and then afterwards apply order of magnitude (1-e210) for precision)
+- implement new algorithm specially taylored for mandelbrot zoom so that the gpu
+doesnt have to deal with higher and higher dbail values for precision or iterations

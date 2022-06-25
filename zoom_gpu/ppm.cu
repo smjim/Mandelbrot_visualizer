@@ -12,7 +12,7 @@ const int length = 601; // length of video in frames
 
 //const coord center = {-0.6081, -0.6756};
 //const coord center = {-0.744749, -0.208039};
-const coord center = {-0.724973, -0.357569}; // seahorse valley
+const coord center = {-0.724973, -0.357569};
 //const coord center = {-0.10109636384562, 0.95628651080914};
 //const coord center = {-0.1010963, 0.9562865};
 const double MAX_R = 2.00000000000;
