@@ -3,6 +3,11 @@
 
 ![mandelbrot set visualization](https://user-images.githubusercontent.com/78174712/174942522-cf79d6e3-fbee-4b69-b639-f72406418298.png)
 
+
+https://user-images.githubusercontent.com/78174712/175756549-c3dfdf9c-4031-4ae5-a88e-972d548550ad.mp4
+(seahorse valley zoom)
+
+
 ## Creating an output
 	- CPU static image:
 		1. Go to cpu directory: `cd static_cpu`
