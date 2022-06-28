@@ -8,8 +8,8 @@ LD_FLAGS    = -lcudart
 
 default: optimized
 
-#convolution.o: ppm.cu ppmKernel.cu
-#	$(NVCC) -c -o convolution.o ppm.cu $(NVCC_FLAGS) -D CONV
+julia.o: ppm.cu ppmMandelbrot.cu
+	$(NVCC) -c -o julia.o ppm.cu $(NVCC_FLAGS) -D JULIA
 
 derbail.o: ppm.cu ppmMandelbrot.cu
 	$(NVCC) -c -o derbail.o ppm.cu $(NVCC_FLAGS) -D DERBAIL 
@@ -17,8 +17,8 @@ derbail.o: ppm.cu ppmMandelbrot.cu
 optimized.o: ppm.cu ppmMandelbrot.cu
 	$(NVCC) -c -o optimized.o ppm.cu $(NVCC_FLAGS) -D OPTIMIZED 
 
-#convolution: convolution.o
-#	$(NVCC) convolution.o -o convolution $(LD_FLAGS)
+julia: julia.o
+	$(NVCC) julia.o -o julia $(LD_FLAGS)
 
 derbail: derbail.o
 	$(NVCC) derbail.o -o derbail $(LD_FLAGS)
@@ -27,4 +27,4 @@ optimized: optimized.o
 	$(NVCC) optimized.o -o optimized $(LD_FLAGS)
 
 clean:
-	rm -rf *.o optimized derbail outfiles/tmp* *.mp4
+	rm -rf *.o optimized derbail julia outfiles/tmp* *.mp4
