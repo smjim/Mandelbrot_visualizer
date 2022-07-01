@@ -15,7 +15,7 @@ struct coord {
 
 // high precision point used for perturbation theory method
 // produces a list of iteration values used to compute the surrounding points
-// function based off of deez_zoom_point function in adelelopez/antelbrot
+// function based off of deep_zoom_point function in adelelopez/antelbrot
 vector<coord> gen_zn(const mpf_class &center_r, const mpf_class &center_i, 
 				int depth)
 {
@@ -44,34 +44,8 @@ vector<coord> gen_zn(const mpf_class &center_r, const mpf_class &center_i,
     return v;
 }
 
-/*
-void gen_zn(coord &z, vector<coord> &zn, int max_iteration) {
-	// using high-precision operations, determine zn for all n = 1 .. max_iteration and store in array	
-	// uses optimized naive method
-
-	coord z1 = {0, 0};
-	coord z2 = {0, 0};
-	int iteration = 0;
-	
-	// z(n+1) = z(n)^2 + c
-	while (iteration < max_iteration) {
-		z1.y = 2*z1.x*z1.y + z.y; 
-		z1.x = z2.x - z2.y + z.x; 
-	
-		z2.x = z1.x*z1.x;
-		z2.y = z1.y*z1.y;
-
-		zn[iteration] = z1;
-		iteration ++; 
-
-		if (z2.x + z2.y > 4) {
-			cout << "given point not part of mandelbrot set: Z = (" << z.x << ", " << z.y << ")" << endl;
-			abort();
-		}
-	}
-}
-*/
-
+// finds iteration approximation for point e in relation to z using zn
+// function based off of deep_zoom_point function in adelelopez/antelbrot
 int pert(coord &e, vector<coord> &zn) {
 
 	int iter = 0;
@@ -100,72 +74,6 @@ int pert(coord &e, vector<coord> &zn) {
 	return iter;
 }
 
-/*
-{
-    int window_radius = (size.x < size.y) = size.x : size.y;
-    // find the complex number at the center of this pixel
-    std::complex<double> d0 (radius * (2 * i - (int) size.x) / window_radius,
-                             -radius * (2 * j - (int) size.y) / window_radius);
-
-    int iter = 0;
-
-    int max_iter = x.size();
-
-    double zn_size;
-    // run the iteration loop
-    std::complex<double> dn = d0; 
-    do  
-    {   
-        dn *= x[iter] + dn; 
-        dn += d0; 
-        ++iter;
-        zn_size = std::norm(x[iter] * 0.5 + dn);
-
-        // use bailout radius of 256 for smooth coloring.
-    }   
-    while (zn_size < 256 && iter < max_iter);
-	return iter;
-}
-*/
-
-float perturbate(vector<coord> zn, coord sigma, coord e) {
-
-	int max_iteration = zn.size();
-
-	// iteration 0
-	coord a = {1, 0}; 
-	coord b = {0, 0}; 
-	coord c = {0, 0}; 
-	coord dn;	// d0 = sigma
-	coord en;	// e0 = e
-
-	// find dn given zn, sigma 
-	for (int n = 0; n < max_iteration; n++) {
-
-		// find dn given d0 (sigma), zn
-
-		coord sigma_2 = {sigma.x*sigma.x - sigma.y*sigma.y      , 2*sigma.x*sigma.y};						// sigma^2
-		coord sigma_3 = {sigma_2.x*sigma.x - sigma_2.y*sigma.y  , sigma_2.x*sigma.y + sigma_2.y*sigma.x};	// sigma^3
-	
-		// d(n) = a(n)*sigma + b(n)*sigma^2 + c(n)*sigma^3 + o(sigma^4) 
-		dn.x = (a.x*sigma.x - a.y*sigma.y) + (b.x*sigma_2.x - b.y*sigma_2.y) + (c.x*sigma_3.x - c.y*sigma_3.y);
-		dn.y = (a.x*sigma.y + a.y*sigma.x) + (b.x*sigma_2.y + b.y*sigma_2.x) + (c.x*sigma_3.y + c.y*sigma_3.x);
-	
-		c = {2*(zn[n].x*c.x - zn[n].y*c.y) + 2*(a.x*b.x - a.y*b.y)  , 2*(zn[n].x*c.y + zn[n].y*c.x) + 2*(a.x*b.y + a.y*b.x)};   // c(n+1) = 2zn(n)c(n) + 2a(n)b(n)
-		b = {2*(zn[n].x*b.x - zn[n].y*b.y) + (a.x*a.x - a.y*a.y)    , 2*(zn[n].x*b.y + zn[n].y*b.x) + 2*(a.x*a.y)};             // b(n+1) = 2zn(n)b(n) + a(n)a(n)
-		a = {2*(zn[n].x*a.x - zn[n].y*a.y) + 1                      , 2*(zn[n].x*a.y + zn[n].y*a.x)};                           // a(n+1) = 2zn(n)a(n) + 1
-
-
-		// using dn, e, approximate en
-		// e = z + d
-		en = {zn[n].x + dn.x, zn[n].y + dn.y};
-
-		// if magnitude of en > 2, return n; otherwise loop until max_iteration
-		float mag = sqrt(pow(en.x, 2) + pow(en.y,2));
-		if (mag > 2.0 || n == max_iteration-1) return n; //mag;
-	}
-	return -1;
-}
 
 int main() {
 	// parameters
@@ -202,7 +110,6 @@ int main() {
 			// find distance vector (sigma)
 			coord sigma = {e.x - z.x, e.y - z.y};
 
-
 			/*---------------- perturbate function explanation:
 				iterate through n = 1, max_iteration
 					find dn given zn, sigma
@@ -210,7 +117,6 @@ int main() {
 					if magnitude(en) > 2, return n
 			 	if n == max_iteration, return max_iteration
 			*/
-			//float value = perturbate(zn, sigma, e);
 			int value = pert(e, zn);
 
 			data << value << " ";
@@ -220,11 +126,3 @@ int main() {
 
 	return 0;
 }
-
-/*	NOTES	
-
-	sigma[] = d0[] = list of values of distance from point to target point (z)
-	diff[] = list of values for escape time of points (paired with sigma[] list)
-	
-	* possibly try out making e vector into two mpf_class values to see if it increases precision, will greatly increase time because inside loop
-*/
