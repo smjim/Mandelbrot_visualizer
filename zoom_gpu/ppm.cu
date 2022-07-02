@@ -3,6 +3,7 @@
 #include <time.h>
 #include <vector>  
 #include <cmath>
+#include <gmpxx.h>
 #include "ppmMandelbrot.cu"
 #include "ppm.h"
 #include "precision.h"
@@ -15,13 +16,12 @@ const int height = 1000;
 const int length = 301; // length of video in frames
 
 // coords for mandelbrot zooms
-//const coord center = {-0.6081, -0.6756};
-//const coord center = {-0.744749, -0.208039};
-//const coord center = {-0.724973, -0.357569};	// seahorse valley
-const coord center = {-0.724973/2, -0.357569/2};	// seahorse valley
-//const coord center = {-0.10109636384562, 0.95628651080914};
-//const coord center = {-0.1010963, 0.9562865};
+//const coord center = {-0.724973/2, -0.357569/2};	// seahorse valley
+//const coord center = {-0.10109636384562/2, 0.95628651080914/2}; // outer intersection
+//const coord center = {-1.7499984109937408174900248316242839345282217233580853461694393097636472584665/2, -0.0000000000000016571246929541869232581096198127918902650429012737576040533449/2};
+const coord center = {-0.72497381200/2, -0.35756855500/2};	// seahorse valley
 
+//const double MAX_R = 2.00000000000;
 const double MAX_R = 2.00000000000;
 const double MIN_R = 0.00000000002;
 
@@ -181,7 +181,7 @@ int main(){
 
 		end = clock();
 		time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    	printf("%f seconds spent ----------- frame %d\n", time_spent, i);
+    	printf("%f seconds spent\t---------- frame %d\n", time_spent, i);
 
         cuda_ret = cudaDeviceSynchronize();
         if(cuda_ret != cudaSuccess) FATAL();	// unable to launch/ execute kernel

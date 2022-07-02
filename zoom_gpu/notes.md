@@ -33,7 +33,9 @@ doesnt have to deal with higher and higher dbail values for precision or iterati
 - [COMPLETE] implement julia set explorer
 - include configuration file to store data about zoom center, zoom depth, and julia set 
 parametric equation *based off of make flags*
+- progress bar to show when rendering complete
 
 ## Errors:
 
 - iterative process zooms in on the first iteration of the point instead of the point
+	- (temporary fix) divide initial point by 2 in initialization
