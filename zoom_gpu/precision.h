@@ -35,6 +35,7 @@ vector<coord> gen_zn(const mpf_class &center_r, const mpf_class &center_i,
         xn_r = xn_r * xn_r - xn_i * xn_i + center_r;
         xn_i = re * xn_i + center_i;
     }   
+
     return v;
 }
 

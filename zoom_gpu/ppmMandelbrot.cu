@@ -187,9 +187,9 @@ __global__ void julia(coord b1, coord b2, coord c, PPMPixel *outputData, int wid
 }
 
 // determines mandelbrot set status for pixels between b1, b2 using peturbation series approx.
-// find 
 // theory for iterative process included in doc/sft_maths.pdf
-__global__ void perturbate(const coord *zn, int max_iter, const coord b1, const coord b2, PPMPixel *outputData, const int width, const int height) {
+__global__ void perturbate(const coord *zn, int max_iter, const coord b1, const coord b2, 
+					PPMPixel *outputData, const int width, const int height) {
 
 	int tx = threadIdx.x;
 	int ty = blockIdx.x;
@@ -219,9 +219,9 @@ __global__ void perturbate(const coord *zn, int max_iter, const coord b1, const 
 	
 	        // dn += e;
 	        dn = {dn.x + e.x, dn.y + e.y};
-	
+
 	        iter ++; 
-	
+
 	        // en_size = norm(0.5*zn[iter] + dn);
 	        en_size = sqrt(pow(0.5*zn[iter].x + dn.x, 2) + pow(0.5*zn[iter].y + dn.y, 2)); 
 	    }   

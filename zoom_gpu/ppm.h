@@ -1,20 +1,20 @@
 #ifndef PPMH
 #define PPMH
 
-typedef struct {
+struct PPMPixel {
      unsigned char red,green,blue;
-} PPMPixel;
+};
 
-typedef struct {
+struct PPMImage {
      int x, y;
      PPMPixel *data;
-} PPMImage;
+};
 
-typedef struct {
+struct coord {
 	// real : x
 	// imag : y
 	double x, y;
-} coord;
+};
 
 
 #endif
