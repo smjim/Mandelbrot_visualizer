@@ -1,9 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <vector>  
 #include <cmath>
+#include <gmpxx.h>
 #include "ppmMandelbrot.cu"
 #include "ppm.h"
+//#include "precision.h"
+
+using std::vector;
 
 const int width = 1000;
 const int height = 1000;
@@ -13,13 +18,16 @@ const int length = 301; // length of video in frames
 // coords for mandelbrot zooms
 //const coord center = {-0.6081, -0.6756};
 //const coord center = {-0.744749, -0.208039};
-//const coord center = {-0.724973, -0.357569};	// seahorse valley
+const coord center = {-0.724973, -0.357569};	// seahorse valley
 //const coord center = {-0.10109636384562, 0.95628651080914};
 //const coord center = {-0.1010963, 0.9562865};
-const coord center = {0.0, 0.0};
+//const coord center = {0.0, 0.0};
 
 const double MAX_R = 2.00000000000;
 const double MIN_R = 0.00000000002;
+
+// for julia set
+//coord center;
 
 #define RGB_COMPONENT_COLOR 255
 
@@ -28,6 +36,38 @@ const double MIN_R = 0.00000000002;
         fprintf(stderr, "[%s:%d] \n", __FILE__, __LINE__, ##__VA_ARGS__);\
         exit(-1);\
     } while(0)
+
+// high precision point used for perturbation theory method
+// produces a list of iteration values used to compute the surrounding points
+// function based off of deep_zoom_point function in adelelopez/antelbrot
+vector<coord> gen_zn(const mpf_class &center_r, const mpf_class &center_i,
+                int depth)
+{
+    vector<coord> v;
+    mpf_class xn_r = center_r;
+    mpf_class xn_i = center_i;
+
+    for (int i = 0; i != depth; ++i)
+    {
+        // pre multiply by two
+        mpf_class re = xn_r + xn_r;
+        mpf_class im = xn_i + xn_i;
+
+        coord c = {re.get_d(), im.get_d()};
+
+        v.push_back(c);
+
+        // make sure our numbers don't get too big
+        if (re > 1024 || im > 1024 || re < -1024 || im < -1024)
+            return v;
+
+        // calculate next iteration, remember re = 2 * xn_r
+        xn_r = xn_r * xn_r - xn_i * xn_i + center_r;
+        xn_i = re * xn_i + center_i;
+    }
+    return v;
+}
+
 
 void writePPM(const char *filename, PPMImage *img)
 {
@@ -68,13 +108,13 @@ void boundaries(int frame, coord &b1, coord &b2) {
 }
 
 // for julia set exploration
-void find_center(int frame, coord &c) {
+void find_center(int frame, coord &center) {
 	// define a parametric equation for c
 	double t = 6.28*(double)frame/length;
 
-	// formula for main cardioid
-	c.x = 0.5*cos(t)-0.25*cos(2*t);
-	c.y = 0.5*sin(t)-0.25*sin(2*t);
+	// formula for radius main cardioid
+	center.x = 0.5*cos(t)-0.25*cos(2*t);
+	center.y = 0.5*sin(t)-0.25*sin(2*t);
 }
 
 
@@ -106,7 +146,6 @@ int main(){
 
 	coord b1 = {center.x + MAX_R, center.y + MAX_R};
 	coord b2 = {center.x - MAX_R, center.y - MAX_R};
-	coord c;
 
     // for each of the frames run the kernel
     for(i = 0; i < length; i++) {
@@ -134,16 +173,53 @@ int main(){
 		time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
 #endif /*OPT*/
 
-#ifdef JULIA
-		find_center(i, c);
+#ifdef DISTANCE
+		boundaries(i, b1, b2);
 		dim3 dim_grid, dim_block;
 		dim_grid = dim3(height, 1,1);
 		dim_block = dim3(width, 1,1);
 		begin = clock();
-		julia<<<dim_grid, dim_block>>>(b1, b2, c, outputData_d, width, height);
+		dist_est<<<dim_grid, dim_block>>>(b1, b2, outputData_d, width, height);
+		end = clock();
+		time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+#endif /*DIST*/
+
+#ifdef JULIA
+		find_center(i, center);
+		dim3 dim_grid, dim_block;
+		dim_grid = dim3(height, 1,1);
+		dim_block = dim3(width, 1,1);
+		begin = clock();
+		julia<<<dim_grid, dim_block>>>(b1, b2, center, outputData_d, width, height);
 		end = clock();
 		time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
 #endif /*JUL*/
+
+#ifdef PERTURBATE 
+		boundaries(i, b1, b2);
+	    mpf_class zx(center.x, 100); 
+	    mpf_class zy(center.y, 100); 
+
+		int depth = 300;
+    	vector<coord> zn(depth);
+    	zn = gen_zn(zx, zy, depth);
+		int max_iteration = zn.size();
+
+		coord *d_zn;
+		size_t bytes = max_iteration*sizeof(coord);
+		cudaMalloc(&d_zn, bytes);
+		cudaMemcpy(d_zn, zn.data(), bytes, cudaMemcpyHostToDevice);
+
+		dim3 dim_grid, dim_block;
+		dim_grid = dim3(height, 1,1);
+		dim_block = dim3(width, 1,1);
+		begin = clock();
+		perturbate<<<dim_grid, dim_block>>>(d_zn, max_iteration, b1, b2, outputData_d, width, height);
+		end = clock();
+		time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+
+		cudaFree(d_zn);
+#endif /*PT*/
 
         cuda_ret = cudaDeviceSynchronize();
         if(cuda_ret != cudaSuccess) FATAL();	// unable to launch/ execute kernel

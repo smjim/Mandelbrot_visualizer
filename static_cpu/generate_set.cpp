@@ -4,7 +4,7 @@
 using namespace std;
 
 void optimized(int max_iteration) {
-	int res = 1000; // resolution of the set boundary
+	int res = 4000; // resolution of the set boundary
 	
 	ofstream data;
 	data.open ("data.txt");
@@ -80,8 +80,8 @@ void derbail(int max_iteration) {
 }
 
 int main() {
-	//optimized(20);
-	derbail(20);
+	optimized(20);
+	//derbail(20);
 
 	return 0;
 }

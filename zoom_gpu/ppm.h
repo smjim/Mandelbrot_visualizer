@@ -11,6 +11,8 @@ typedef struct {
 } PPMImage;
 
 typedef struct {
+	// real : x
+	// imag : y
 	double x, y;
 } coord;
 
