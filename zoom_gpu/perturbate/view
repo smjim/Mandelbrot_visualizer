@@ -1,0 +1,5 @@
+#!/bin/bash -i
+
+ffmpeg -framerate 24 -i outfiles/tmp%03d.ppm -c:v libx264 -r 30 -pix_fmt yuv420p output_video.mp4 -y
+mpv output_video.mp4
+

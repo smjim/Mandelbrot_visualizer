@@ -2,8 +2,8 @@ CC=gcc
 LDFLAGS:=-lm
 
 NVCC        = nvcc
-NVCC_FLAGS  = -O3 -lgmpxx -lgmp
-LD_FLAGS    = -lcudart -lgmpxx -lgmp
+NVCC_FLAGS  = -O3
+LD_FLAGS    = -lcudart
 
 
 default: optimized
@@ -21,9 +21,6 @@ dist.o: ppm.cu ppmMandelbrot.cu
 julia.o: ppm.cu ppmMandelbrot.cu
 	$(NVCC) -c -o julia.o ppm.cu $(NVCC_FLAGS) -D JULIA
 
-perturbate.o: ppm.cu ppmMandelbrot.cu precision.h
-	$(NVCC) -c -o perturbate.o ppm.cu $(NVCC_FLAGS) -D PERTURBATE
-
 
 optimized: optimized.o
 	$(NVCC) optimized.o -o optimized $(LD_FLAGS)
@@ -37,8 +34,5 @@ dist: dist.o
 julia: julia.o
 	$(NVCC) julia.o -o julia $(LD_FLAGS)
 
-perturbate: perturbate.o
-	$(NVCC) perturbate.o -o perturbate $(LD_FLAGS)
-
 clean:
-	rm -rf *.o optimized derbail julia dist perturbate outfiles/tmp* *.mp4
+	rm -rf *.o optimized derbail julia dist outfiles/tmp* *.mp4

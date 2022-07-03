@@ -34,6 +34,7 @@ doesnt have to deal with higher and higher dbail values for precision or iterati
 - include configuration file to store data about zoom center, zoom depth, and julia set 
 parametric equation *based off of make flags*
 - progress bar to show when rendering complete
+- operate on batches of frames in parallel to parallelize even further
 
 ## Errors:
 
