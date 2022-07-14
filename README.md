@@ -9,14 +9,14 @@ https://user-images.githubusercontent.com/78174712/175756549-c3dfdf9c-4031-4ae5-
 
 
 ## Creating an output
-	- CPU static image:
-		1. Go to cpu directory: `cd static_cpu`
-		2. Generate data: `g++ generate_set.cpp -o Generate`, and `./Generate`
-		3. Display data: `python3 display.py`
-	- GPU dynamic video:
-		1. Edit center, MAX_R, MIN_R, and length in ppm.cu
-		2. Compile and generate the video: `make`, and `./zoom`
-		3. Combine output frames: `ffmpeg -framerate 24 -i outfiles/tmp%03d.ppm -c:v libx264 -r 30 -pix_fmt yuv420p output_video.mp4`
+ - CPU static image:
+	1. Go to cpu directory: `cd static_cpu`
+	2. Generate data: `g++ generate_set.cpp -o Generate`, and `./Generate`
+	3. Display data: `python3 display.py`
+ - GPU dynamic video:
+	1. Edit center, MAX_R, MIN_R, and length in ppm.cu
+	2. Compile and generate the video: `make`, and `./zoom`
+	3. Combine output frames: `ffmpeg -framerate 24 -i outfiles/tmp%03d.ppm -c:v libx264 -r 30 -pix_fmt yuv420p output_video.mp4`
 
 ## Design and implementation
 GPU accelerated video creation tool developed using code adapted from [cuda-video-project](https://github.com/bojdell/cuda-video-project).
